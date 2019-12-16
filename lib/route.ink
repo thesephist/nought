@@ -43,13 +43,17 @@ matchPath := (pattern, path) => (
 )
 
 ` returns the proper handler curried with url params `
-match := (router, path) => (
-	result := matchPath(patterns.(i).0, path)
-	(sub := i => result :: {
+match := (router, path) => (sub := i => (
+	result := matchPath(router.(i).0, path)
+	result :: {
 		() -> i :: {
-			len(router) -> ()
+			len(router) -> req => (req.end)({
+				status: 200
+				headers: {}
+				body: 'dropped route'
+			})
 			_ -> sub(i + 1)
 		}
-		_ -> (patterns.(i).1)(result)
-	})(0)
-)
+		_ -> (router.(i).1)(result)
+	}
+))(0)

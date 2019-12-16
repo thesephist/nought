@@ -2,8 +2,14 @@
 
 std := load('../vendor/std')
 
+each := std.each
 f := std.format
 readFile := std.readFile
+
+TPLROOT := './tpl/'
+PARTS := [
+	'parts/head'
+]
 
 ` given a path to a template, prepare it
 	for future use (cache it) `
@@ -12,7 +18,11 @@ prepare := path => (
 		content: '{{ missing template }}'
 	}
 
-	readFile(path, s => tpl.content := s)
+	readFile(TPLROOT + path + '.html', s => tpl.content := s)
+	each(PARTS, key => readFile(
+		TPLROOT + key + '.html'
+		s => tpl.content := f(tpl.content, key)
+	))
 )
 
 ` given a prepared template returned from prepare(),
