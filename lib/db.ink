@@ -4,6 +4,7 @@ std := load('../vendor/std')
 uuid := load('../vendor/uuid')
 json := load('../vendor/json')
 
+log := std.log
 readFile := std.readFile
 writeFile := std.writeFile
 each := std.each
@@ -48,6 +49,8 @@ create := db => (collection, attrs) => (
 	` generate a uuid for every new model `
 	x := coll.(nxt)
 	x.id := uuid()
+
+	(db.flush)()
 	x
 )
 
@@ -55,6 +58,7 @@ create := db => (collection, attrs) => (
 update := db => (collection, attrs, delta) => (
 	x := (db.get)(collection, attrs)
 	each(keys(delta), k => x.(k) := delta.(k))
+	(db.flush)()
 )
 
 ` retrieve the first matching instance of a collection `
@@ -79,6 +83,7 @@ where := db => (collection, attrs) => (
 remove := db => (collection, attrs) => (
 	coll := (db.ensureCollection)(collection)
 	db.data.(collection) := filter(coll, x => ~matches(x, attrs))
+	(db.flush)()
 )
 
 ` instantiate a new database `
