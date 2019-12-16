@@ -6,6 +6,10 @@ std := load('vendor/std')
 
 log := std.log
 f := std.format
+each := std.each
+
+auth := load('lib/auth')
+allow? := auth.allow?
 
 route := load('lib/route')
 services := {
@@ -41,11 +45,11 @@ close := listen('0.0.0.0:' + string(PORT), evt => evt.type :: {
 
 		` respond to file request `
 		handle := (route.match)(router, url)
-		evt.data.method :: {
-			'GET' -> handle(evt)
-			'POST' -> handle(evt)
-			'PUT' -> handle(evt)
-			'DELETE' -> handle(evt)
+		[allow?(evt), evt.data.method] :: {
+			[true, 'GET'] -> handle(evt)
+			[true, 'POST'] -> handle(evt)
+			[true, 'PUT'] -> handle(evt)
+			[true, 'DELETE'] -> handle(evt)
 			_ -> (
 				` if other methods, just drop the request `
 				log('  -> ' + evt.data.url + ' dropped')
