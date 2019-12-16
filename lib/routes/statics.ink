@@ -52,12 +52,12 @@ handleStatics := params => req => (
 				body: s
 			}))
 		})
-		_ -> sub(i + 1)
 		() -> (req.end)({
 			status: 404
 			headers: {}
 			body: 'template not registered'
 		})
+		_ -> sub(i + 1)
 	})(0)
 )
 
