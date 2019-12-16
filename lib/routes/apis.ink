@@ -4,6 +4,10 @@ std := load('../../vendor/std')
 json := load('../../vendor/json')
 db := load('../db')
 
+ser := json.ser
+de := json.de
+instance := db.instance
+
 handler := params => req => (
 	apiPath := params.apiPath
 

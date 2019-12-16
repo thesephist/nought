@@ -17,10 +17,7 @@ matchPath := (pattern, path) => (
 	desired := filter(split(pattern, '/'), s => ~(s = ''))
 	actual := filter(split(path, '/'), s => ~(s = ''))
 
-	max := (len(desired) > len(actual) :: {
-		true -> len(desired)
-		false -> len(actual)
-	})
+	max := (std.max)([len(desired), len(actual)])
 
 	params := {}
 	(sub := i => i :: {
