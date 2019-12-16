@@ -21,7 +21,7 @@ log('Nought starting...')
 ` attach routes `
 router := (route.new)()
 add := (url, handler) => (route.add)(router, url, handler)
-add('/static/:staticPath', services.statics.handler)
+add('/static/*staticPath', services.statics.handler)
 add('/api/person', services.apis.allPersonHandler)
 add('/api/person/:personID', services.apis.personHandler)
 add('/api/event', services.apis.allEventHandler)

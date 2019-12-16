@@ -4,6 +4,8 @@ std := load('../vendor/std')
 str := load('../vendor/str')
 
 slice := std.slice
+sliceList := std.sliceList
+cat := std.cat
 filter := std.filter
 split := str.split
 
@@ -39,6 +41,10 @@ matchPath := (pattern, path) => (
 					params.(slice(desiredPart, 1, len(desiredPart))) := actualPart
 					sub(i + 1)
 				)
+				'*' -> (
+					params.(slice(desiredPart, 1, len(desiredPart))) := cat(sliceList(actual, i, len(actual)), '/')
+					params
+				)
 				_ -> desiredPart :: {
 					actualPart -> sub(i + 1)
 					_ -> ()
@@ -47,7 +53,7 @@ matchPath := (pattern, path) => (
 		)
 	})
 
-	[len(desired) = len(actual), pattern] :: {
+	[len(desired) < len(actual) | len(desired) = len(actual), pattern] :: {
 		` '' is used as a catch-all pattern `
 		[_, ''] -> params
 		[true, _] -> findMatchingParams(0)
