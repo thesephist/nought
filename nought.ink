@@ -10,7 +10,7 @@ f := std.format
 route := load('lib/route')
 providers := {
 	statics: load('lib/routes/statics')
-	api: load('lib/routes/api')
+	apis: load('lib/routes/apis')
 	errors: load('lib/routes/errors')
 }
 
@@ -21,9 +21,10 @@ log('Nought starting...')
 ` attach routes `
 router := (route.new)()
 (route.add)(router, '/static/:staticPath', providers.statics.handler)
-(route.add)(router, '/api/:apiPath', providers.api.handler)
+(route.add)(router, '/api/:apiPath', providers.apis.handler)
 (route.add)(router, '/:blank', providers.errors.handler)
 
+` start http server `
 close := listen('0.0.0.0:' + string(PORT), evt => evt.type :: {
 	'error' -> log('server error: ' + evt.message)
 	'req' -> (
