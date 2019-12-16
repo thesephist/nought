@@ -10,21 +10,29 @@ split := str.split
 new := () => []
 
 add := (router, pattern, handler) => router.len(router) := [pattern, handler]
+catch := (router, handler) => add(router, '', handler)
+
+splitPath := url => filter(split(url, '/'), s => ~(s = ''))
 
 ` if path matches pattern, return a hash of matched params.
 	else, return () `
 matchPath := (pattern, path) => (
-	desired := filter(split(pattern, '/'), s => ~(s = ''))
-	actual := filter(split(path, '/'), s => ~(s = ''))
+	desired := splitPath(pattern)
+	actual := splitPath(path)
 
-	max := (std.max)([len(desired), len(actual)])
-
+	max := len(desired)
 	params := {}
-	(sub := i => i :: {
+	findMatchingParams := (sub := i => i :: {
 		max -> params
 		_ -> (
-			desiredPart := desired.(i)
-			actualPart := actual.(i)
+			desiredPart := (desired.(i) :: {
+				() -> ''
+				_ -> desired.(i)
+			})
+			actualPart := (actual.(i) :: {
+				() -> ''
+				_ -> actual.(i)
+			})
 
 			desiredPart.0 :: {
 				':' -> (
@@ -37,21 +45,28 @@ matchPath := (pattern, path) => (
 				}
 			}
 		)
-	})(0)
+	})
+
+	[len(desired) = len(actual), pattern] :: {
+		` '' is used as a catch-all pattern `
+		[_, ''] -> params
+		[true, _] -> findMatchingParams(0)
+		_ -> ()
+	}
 )
 
 ` returns the proper handler curried with url params `
-match := (router, path) => (sub := i => (
-	result := matchPath(router.(i).0, path)
-	result :: {
-		() -> i :: {
-			len(router) -> req => (req.end)({
-				status: 200
-				headers: {}
-				body: 'dropped route'
-			})
-			_ -> sub(i + 1)
+match := (router, path) => (sub := i => i :: {
+	len(router) -> req => (req.end)({
+		status: 200
+		headers: {}
+		body: 'dropped route. you should never see this in production.'
+	})
+	_ -> (
+		result := matchPath(router.(i).0, path)
+		result :: {
+			() -> sub(i + 1)
+			_ -> (router.(i).1)(result)
 		}
-		_ -> (router.(i).1)(result)
-	}
-))(0)
+	)
+})(0)

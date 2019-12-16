@@ -8,7 +8,7 @@ log := std.log
 f := std.format
 
 route := load('lib/route')
-providers := {
+services := {
 	statics: load('lib/routes/statics')
 	apis: load('lib/routes/apis')
 	errors: load('lib/routes/errors')
@@ -21,12 +21,14 @@ log('Nought starting...')
 ` attach routes `
 router := (route.new)()
 add := (url, handler) => (route.add)(router, url, handler)
-add('/static/:staticPath', providers.statics.handler)
-add('/api/person/:personID', providers.apis.personHandler)
-add('/api/event/:eventID', providers.apis.eventHandler)
-add('/api/:apiPath', providers.apis.handler)
-add('/', providers.statics.indexHandler)
-add('/:blank', providers.errors.handler)
+add('/static/:staticPath', services.statics.handler)
+add('/api/person', services.apis.allPersonHandler)
+add('/api/person/:personID', services.apis.personHandler)
+add('/api/event', services.apis.allEventHandler)
+add('/api/event/:eventID', services.apis.eventHandler)
+add('/', services.statics.indexHandler)
+` catch-all handler for 404s `
+(route.catch)(router, services.errors.handler)
 
 ` start http server `
 close := listen('0.0.0.0:' + string(PORT), evt => evt.type :: {
@@ -38,12 +40,12 @@ close := listen('0.0.0.0:' + string(PORT), evt => evt.type :: {
 		url := trimQP(evt.data.url)
 
 		` respond to file request `
-		match := (route.match)(router, url)
+		handle := (route.match)(router, url)
 		evt.data.method :: {
-			'GET' -> match(evt)
-			'POST' -> match(evt)
-			'PUT' -> match(evt)
-			'DELETE' -> match(evt)
+			'GET' -> handle(evt)
+			'POST' -> handle(evt)
+			'PUT' -> handle(evt)
+			'DELETE' -> handle(evt)
 			_ -> (
 				` if other methods, just drop the request `
 				log('  -> ' + evt.data.url + ' dropped')
