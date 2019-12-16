@@ -26,9 +26,6 @@ matchPath := (pattern, path) => (
 			desiredPart := desired.(i)
 			actualPart := actual.(i)
 
-			(std.log)(desiredPart)
-			(std.log)(actualPart)
-
 			desiredPart.0 :: {
 				':' -> (
 					params.(slice(desiredPart, 1, len(desiredPart))) := actualPart

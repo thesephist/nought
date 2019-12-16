@@ -109,7 +109,7 @@ new := path => (
 		path
 		s => de(s) :: {
 			` guard against failed reads, crash early `
-			() -> (std.log)('Failed database Read!')
+			() -> (std.log)('Failed database read!')
 			_ -> instance.data := de(s)
 		}
 	)
