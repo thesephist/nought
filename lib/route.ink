@@ -4,6 +4,7 @@ std := load('../vendor/std')
 str := load('../vendor/str')
 
 slice := std.slice
+filter := std.filter
 split := str.split
 
 new := () => []
@@ -13,8 +14,8 @@ add := (router, pattern, handler) => router.len(router) := [pattern, handler]
 ` if path matches pattern, return a hash of matched params.
 	else, return () `
 matchPath := (pattern, path) => (
-	desired := split(pattern, '/')
-	actual := split(path, '/')
+	desired := filter(split(pattern, '/'), s => ~(s = ''))
+	actual := filter(split(path, '/'), s => ~(s = ''))
 
 	max := (len(desired) > len(actual) :: {
 		true -> len(desired)
@@ -27,6 +28,9 @@ matchPath := (pattern, path) => (
 		_ -> (
 			desiredPart := desired.(i)
 			actualPart := actual.(i)
+
+			(std.log)(desiredPart)
+			(std.log)(actualPart)
 
 			desiredPart.0 :: {
 				':' -> (

@@ -30,7 +30,13 @@ handler := params => req => (
 		_ -> (req.end)({
 			status: 200
 			headers: {}
-			body: use(TPLS.(staticPath), {title: staticPath})
+			body: use(TPLS.(staticPath), {title: staticPath + '| nought'})
 		})
 	}
 )
+
+indexHandler := _ => req => (req.end)({
+	status: 200
+	headers: {}
+	body: use(TPLS.index, {title: 'nought'})
+})

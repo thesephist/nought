@@ -20,9 +20,13 @@ log('Nought starting...')
 
 ` attach routes `
 router := (route.new)()
-(route.add)(router, '/static/:staticPath', providers.statics.handler)
-(route.add)(router, '/api/:apiPath', providers.apis.handler)
-(route.add)(router, '/:blank', providers.errors.handler)
+add := (url, handler) => (route.add)(router, url, handler)
+add('/static/:staticPath', providers.statics.handler)
+add('/api/person/:personID', providers.apis.personHandler)
+add('/api/event/:eventID', providers.apis.eventHandler)
+add('/api/:apiPath', providers.apis.handler)
+add('/', providers.statics.indexHandler)
+add('/:blank', providers.errors.handler)
 
 ` start http server `
 close := listen('0.0.0.0:' + string(PORT), evt => evt.type :: {
@@ -34,12 +38,12 @@ close := listen('0.0.0.0:' + string(PORT), evt => evt.type :: {
 		url := trimQP(evt.data.url)
 
 		` respond to file request `
+		match := (route.match)(router, url)
 		evt.data.method :: {
-			'GET' -> (route.match)(router, url)(evt)
-			'POST' -> (route.match)(router, url)(evt)
-			'PUT' -> (route.match)(router, url)(evt)
-			'DELETE' -> (route.match)(router, url)(evt)
-
+			'GET' -> match(evt)
+			'POST' -> match(evt)
+			'PUT' -> match(evt)
+			'DELETE' -> match(evt)
 			_ -> (
 				` if other methods, just drop the request `
 				log('  -> ' + evt.data.url + ' dropped')

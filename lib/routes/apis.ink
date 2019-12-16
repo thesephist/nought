@@ -11,6 +11,26 @@ handler := params => req => (
 	(req.end)({
 		status: 200
 		headers: {}
-		body: 'api test'
+		body: 'api test at path ' + apiPath
+	})
+)
+
+personHandler := params => req => (
+	personID := params.personID
+
+	(req.end)({
+		status: 200
+		headers: {}
+		body: 'person with ID ' + personID
+	})
+)
+
+eventHandler := params => req => (
+	eventID := params.eventID
+
+	(req.end)({
+		status: 200
+		headers: {}
+		body: 'event with ID ' + eventID
 	})
 )
