@@ -14,6 +14,7 @@ TPLS := {
 
 STATICS := [
 	'css/main.css'
+	'css/util.css'
 	'js/main.js'
 ]
 

@@ -5,12 +5,21 @@ const {
 
 class App extends StyledComponent {
     init() {
-
+        this.count = 1;
     }
     compose() {
-        return jdom`<div class="app">
+        return jdom`<div class="app page-s auto-center">
             Hello from nought!
-            <button>click me</button>
+
+            <div class="flex flex-row justify-start align-center">
+                <p class="mr2">
+                    ${this.count} taps
+                </p>
+                <button onclick="${_ => {
+                    this.count++;
+                    this.render();
+                }}">tap me</button>
+            </div>
         </div>`;
     }
 }
